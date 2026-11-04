@@ -3,6 +3,7 @@ import { STRINGS } from './strings.js';
 import { startBackground } from './background.js';
 import { fetchPlaylist, readCache, isConfigured, thumb } from './playlist.js';
 import { createViewer } from './viewer.js';
+import { createSpace } from './space.js';
 
 const $ = (selector) => document.querySelector(selector);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -16,6 +17,8 @@ let items = [];
 let state = 'loading'; // loading | ready | empty | error | config
 let lastFetch = 0;
 let openedFromHash = false;
+let vrReady = false;
+let returnToSpace = false;
 
 // ---------- Language ----------
 function pickLanguage() {
@@ -40,19 +43,11 @@ function applyStrings() {
     button.setAttribute('aria-pressed', String(button.dataset.lang === lang));
   }
   $('#questHint').hidden = !isQuest();
-  const quest2 = document.querySelector('[data-i18n="quest2"]');
-  const quest3 = document.querySelector('[data-i18n="quest3"]');
-  if (isQuest()) {
-    document.querySelector('[data-i18n="quest1"]').textContent = t('questOpenHint');
-    quest2.hidden = true;
-    quest3.hidden = true;
-  } else {
-    quest2.hidden = false;
-    quest3.hidden = false;
-  }
+  $('#spaceBtnLabel').textContent = vrReady ? t('enterVR') : t('spaceOpen');
   renderStatus();
   renderCards();
   viewer.refresh();
+  space.refresh();
 }
 
 for (const button of document.querySelectorAll('[data-lang]')) {
@@ -111,6 +106,7 @@ function renderStatus() {
     status.append(reload);
   }
   $('#startBtn').disabled = !items.length;
+  $('#spaceBtn').disabled = !items.length;
 }
 
 function renderCards() {
@@ -185,6 +181,7 @@ async function refresh() {
     items = fresh;
     setState(items.length ? 'ready' : 'empty');
     viewer.refresh();
+    space.refresh();
     openFromHash();
   } catch (error) {
     console.warn('Playlist could not be loaded:', error);
@@ -209,9 +206,35 @@ const viewer = createViewer({
   getItems: () => items,
   t,
   onOpen: () => background.pause(),
+  onClose: () => {
+    background.resume();
+    // Coming back from a film chosen in the 360° gallery: return to the gallery.
+    if (returnToSpace) {
+      returnToSpace = false;
+      space.open();
+    }
+  },
+});
+
+const space = createSpace({
+  getItems: () => items,
+  t,
+  onSelect: (i) => {
+    returnToSpace = !isQuest();
+    space.close();
+    openFilm(i);
+  },
+  onOpen: () => background.pause(),
   onClose: () => background.resume(),
 });
 
+// On a VR headset the main button enters VR straight away.
+space.vrReady().then((ok) => {
+  vrReady = Boolean(ok);
+  $('#spaceBtnLabel').textContent = vrReady ? t('enterVR') : t('spaceOpen');
+});
+
+$('#spaceBtn').addEventListener('click', () => space.open({ vr: vrReady }));
 $('#startBtn').addEventListener('click', () => openFilm(0));
 
 const cached = isConfigured() ? readCache() : null;

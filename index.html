@@ -34,9 +34,15 @@
       <p class="hero-meta" data-i18n="heroMeta"></p>
       <h1 class="hero-title" id="heroTitle"></h1>
       <p class="hero-sub" data-i18n="heroSub"></p>
-      <button class="btn btn-primary" id="startBtn" type="button" disabled>
-        <span data-i18n="start"></span>
-      </button>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="spaceBtn" type="button" disabled>
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="4" ry="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span id="spaceBtnLabel"></span>
+        </button>
+        <button class="btn" id="startBtn" type="button" disabled>
+          <span data-i18n="start"></span>
+        </button>
+      </div>
     </section>
 
     <section class="gallery" aria-labelledby="galleryTitle">
@@ -112,6 +118,26 @@
 
     <p class="viewer-help" id="viewerHelp" data-i18n="help"></p>
     <ul class="strip" id="strip"></ul>
+  </div>
+
+  <!-- 360° gallery: look around, or enter VR on a headset -->
+  <div class="space" id="space" role="dialog" aria-modal="true" aria-labelledby="spaceTitle" hidden>
+    <canvas class="space-canvas" id="spaceCanvas" tabindex="0" role="application" data-i18n-label="spaceCanvas"></canvas>
+    <div class="space-bar">
+      <button class="btn btn-ghost" id="spaceBack" type="button" data-i18n-label="spaceBack">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-i18n="spaceBack"></span>
+      </button>
+      <h2 class="visually-hidden" id="spaceTitle" data-i18n="heroTitle"></h2>
+    </div>
+    <div class="space-foot">
+      <p class="space-hint" id="spaceHint"></p>
+      <button class="btn btn-primary" id="vrBtn" type="button" hidden>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5A2.5 2.5 0 0 1 5.5 7h13A2.5 2.5 0 0 1 21 9.5v5a2.5 2.5 0 0 1-2.5 2.5h-3.2l-1.6-2.4a2 2 0 0 0-3.4 0L8.7 17H5.5A2.5 2.5 0 0 1 3 14.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span data-i18n="enterVR"></span>
+      </button>
+    </div>
+    <p class="visually-hidden" id="spaceLive" aria-live="polite"></p>
   </div>
 
   <!-- Off-screen helper used to read the playlist -->

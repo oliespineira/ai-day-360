@@ -60,6 +60,16 @@ Then open `http://localhost:8000` (or the address `npx serve` shows).
 
 You don't touch the website. To add, remove or reorder films, change the playlist on YouTube. Open pages pick up the changes when they're reloaded or when a headset wakes up.
 
+## The 360° gallery
+
+The main button opens a space where the films float all around you.
+
+- **Meta Quest:** the button says **Enter VR**. Point at a film with the controller and press the trigger. The film opens on YouTube in 360°; use the browser's Back button to return.
+- **Computer:** drag to look around, click a film to watch it. The arrow keys move between films and Enter opens one.
+- **Phone:** drag with a finger to look around, tap a film.
+
+The films in the gallery come from the same YouTube playlist, so there is nothing extra to update.
+
 ## If something goes wrong
 
 | Problem | Fix |
