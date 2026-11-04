@@ -1,4 +1,3 @@
-import { PLAYLIST_ID } from './config.js';
 import { STRINGS } from './strings.js';
 import { startBackground } from './background.js';
 import { fetchPlaylist, readCache, isConfigured, thumb } from './playlist.js';
@@ -160,15 +159,33 @@ function renderCards() {
 }
 
 // On Quest, skip the in-site viewer (it can't show YouTube's 360° controls)
-// and go straight to the video on youtube.com, in the same tab.
+// and open the film on youtube.com instead.
 function openFilm(i) {
   const item = items[i];
   if (!item) return;
   if (isQuest()) {
-    location.href = `https://www.youtube.com/watch?v=${item.id}&list=${PLAYLIST_ID}`;
+    openOnYouTube(item.id);
     return;
   }
   viewer.open(i);
+}
+
+// The film opens in its own tab, so the gallery stays open, exactly as it was,
+// in this tab: closing the YouTube tab brings you straight back. Every film
+// reuses that one YouTube tab, so tabs don't pile up. The link is just the one
+// film (no playlist), so YouTube doesn't play on into the other films.
+function openOnYouTube(id) {
+  const url = `https://www.youtube.com/watch?v=${id}`;
+  let tab = null;
+  try { tab = window.open(url, 'aiday-film'); } catch { tab = null; }
+  if (tab) {
+    try { tab.focus(); } catch { /* ignore */ }
+    return;
+  }
+  // The browser blocked the new tab: open the film here instead, and mark the
+  // address so the 360° gallery reopens when you press Back.
+  history.replaceState(null, '', '#gallery');
+  location.href = url;
 }
 
 // ---------- Playlist ----------
@@ -190,7 +207,14 @@ async function refresh() {
 }
 
 function openFromHash() {
-  if (openedFromHash || viewer.isOpen()) return;
+  if (openedFromHash || viewer.isOpen() || space.isOpen()) return;
+  if (location.hash === '#gallery' && items.length) {
+    // Back from YouTube: return to the 360° gallery (one press of Enter VR on a headset).
+    openedFromHash = true;
+    history.replaceState(null, '', location.pathname + location.search);
+    space.open();
+    return;
+  }
   const match = location.hash.match(/^#video-([\w-]{6,})$/);
   if (!match) return;
   const index = items.findIndex((item) => item.id === match[1]);
@@ -220,7 +244,9 @@ const space = createSpace({
   getItems: () => items,
   t,
   onSelect: (i) => {
-    returnToSpace = !isQuest();
+    // On Quest the film opens in another tab, so the gallery stays open here.
+    if (isQuest()) { openFilm(i); return; }
+    returnToSpace = true;
     space.close();
     openFilm(i);
   },
@@ -245,6 +271,7 @@ if (cached && cached.length) {
 
 applyStrings();
 decodeTitle($('#heroTitle'), t('heroTitle'));
+if (items.length) openFromHash();
 refresh();
 
 // A headset left open picks up new videos when the page becomes visible again.

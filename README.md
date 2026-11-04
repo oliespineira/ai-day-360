@@ -64,7 +64,7 @@ You don't touch the website. To add, remove or reorder films, change the playlis
 
 The main button opens a space where the films float all around you.
 
-- **Meta Quest:** the button says **Enter VR**. Point at a film with the controller and press the trigger. The film opens on YouTube in 360°; use the browser's Back button to return.
+- **Meta Quest:** the button says **Enter VR**. Point at a film with the controller and press the trigger. The film opens on YouTube in 360° in a new tab; close that tab to come back to the gallery, then press **Enter VR** again. (If the browser blocks the new tab, the film opens in the same tab and pressing Back returns to the gallery.)
 - **Computer:** drag to look around, click a film to watch it. The arrow keys move between films and Enter opens one.
 - **Phone:** drag with a finger to look around, tap a film.
 
